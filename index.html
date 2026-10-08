@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eyeshadow Label Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+/* Layout: instrument-style two-pane bench — controls on the left, report + spectrum on the right; stacks on phones */
+:root{
+  --bg:#f5f6f4; --panel:#ffffff; --ink:#1d2322; --muted:#5d6764; --line:#d9dedb;
+  --accent:#a63d1c; --talc:#2f7a4f; --resid:#a63d1c; --meas:#1d2322; --shade:#eef0ee; --caution:#fbece6;
+  --ok:#2f7a4f; --ok-bg:#e3f1e8; --warn:#9a6a00; --warn-bg:#fbf1d9; --bad:#a63d1c; --bad-bg:#f9e4dc; --na:#5d6764; --na-bg:#eceeed;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141817; --panel:#1c2120; --ink:#e7ebe9; --muted:#9aa5a1; --line:#2f3634;
+  --accent:#e0805c; --talc:#6cc191; --resid:#e0805c; --meas:#e7ebe9; --shade:#232927; --caution:#2e221d;
+  --ok:#7fd1a2; --ok-bg:#1f3328; --warn:#e6bb5c; --warn-bg:#352c17; --bad:#f09a78; --bad-bg:#3a2219; --na:#9aa5a1; --na-bg:#262c2a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141817; --panel:#1c2120; --ink:#e7ebe9; --muted:#9aa5a1; --line:#2f3634;
+  --accent:#e0805c; --talc:#6cc191; --resid:#e0805c; --meas:#e7ebe9; --shade:#232927; --caution:#2e221d;
+  --ok:#7fd1a2; --ok-bg:#1f3328; --warn:#e6bb5c; --warn-bg:#352c17; --bad:#f09a78; --bad-bg:#3a2219; --na:#9aa5a1; --na-bg:#262c2a; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 48px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:22px}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(1.5rem,3vw,2rem);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.lede{color:var(--muted);margin:4px 0 0;max-width:62ch}
+.tag{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.pane{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px;min-width:0}
+.stack{display:flex;flex-direction:column;gap:18px;min-width:0}
+h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 10px}
+label.field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+select,input[type=file]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 8px;width:100%}
+.controls{display:flex;flex-direction:column;gap:16px}
+.checks{display:grid;grid-template-columns:1fr;gap:4px}
+.checks label{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer;padding:3px 0}
+input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+.note{font-size:12.5px;color:var(--muted)}
+.drop{border:1.5px dashed var(--line);border-radius:6px;padding:14px;text-align:center;font-size:13px;color:var(--muted)}
+.drop.over{border-color:var(--accent);color:var(--ink)}
+.err{color:var(--bad);font-size:13px}
+.summary{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:620px){.summary{grid-template-columns:1fr 1fr}}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--mono);font-weight:500;font-size:1.6rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.bar{height:8px;background:var(--shade);border-radius:4px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--talc)}
+.sample{font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:12px;overflow-wrap:anywhere}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.03em}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.p-ok{color:var(--ok);background:var(--ok-bg)} .p-warn{color:var(--warn);background:var(--warn-bg)}
+.p-bad{color:var(--bad);background:var(--bad-bg)} .p-na{color:var(--na);background:var(--na-bg)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;margin-bottom:8px}
+.legend label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.sw{display:inline-block;width:18px;height:3px;border-radius:2px}
+svg{display:block;width:100%;height:auto}
+svg text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+.btn{font:inherit;font-size:13px;font-weight:600;color:var(--panel);background:var(--ink);border:0;border-radius:4px;padding:8px 14px;cursor:pointer}
+.btn:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+ul.caveats{margin:0;padding-left:18px;font-size:13.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:80ch}
+.ex{font-size:11px;font-family:var(--mono);color:var(--warn);background:var(--warn-bg);padding:1px 7px;border-radius:999px;margin-left:6px}
+body:not(.loaded) .needs{display:none} body.loaded .empty{display:none}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <div class="tag">ATR-FTIR · prototype v0.4</div>
+    <h1>Eyeshadow Label Check</h1>
+    <p class="lede">Upload an ATR-FTIR spectrum of one eyeshadow pan and get a component-by-component screen of eight base ingredients against official and published reference bands.</p>
+  </div>
+</header>
+
+<div class="grid">
+  <aside class="pane controls" aria-label="Inputs">
+    <div>
+      <h2>1 · Spectrum</h2>
+      <div class="controls">
+        <div class="drop" id="drop">
+          <label for="file" style="cursor:pointer"><b>Upload your ATR-FTIR spectrum</b><br>.txt / .csv / .dpt, two columns:<br>wavenumber, %T or T or absorbance<br>(drag the file here or choose it)</label>
+          <input type="file" id="file" accept=".txt,.csv,.dat,.dpt" style="margin-top:8px">
+        </div>
+        <label class="field" for="units">Y-axis values
+          <select id="units">
+            <option value="auto">Detect automatically</option>
+            <option value="T%">Transmittance (%)</option>
+            <option value="T">Transmittance (0–1)</option>
+            <option value="A">Absorbance</option>
+          </select>
+        </label>
+        <div class="err" id="err" role="alert"></div>
+      </div>
+    </div>
+    <div>
+      <h2>2 · What is tested</h2>
+      <p class="note">Eight common eyeshadow base ingredients, each by its diagnostic band from a published or database reference (see References). Pigments are not tested: most give weak or overlapping bands below 600 cm⁻¹.</p>
+      <p class="note">Compare the result with the label yourself: a component that is <b>Detected</b> but not declared, or declared but <b>Not detected</b>, is worth a closer look.</p>
+    </div>
+  </aside>
+
+  <main class="stack">
+    <section class="pane empty" aria-label="Start">
+      <h2>No spectrum loaded</h2>
+      <p class="note" style="font-size:14px">Upload one ATR-FTIR spectrum of an eyeshadow pan on the left. The spectrum must cover at least 700–3700 cm⁻¹. Nothing is sent anywhere: the file is read and analysed in your browser.</p>
+    </section>
+    <section class="pane needs" aria-label="Summary">
+      <div class="sample" id="sampleName"></div>
+      <div class="summary">
+        <div class="stat"><span>Talc OH band vs NIST talc</span><b id="share">–</b><span id="shareSub"></span></div>
+        <div class="stat"><span>Detected</span><b id="nOk">–</b></div>
+        <div class="stat"><span>Weak / possible</span><b id="nMiss">–</b></div>
+        <div class="stat"><span>Not detected</span><b id="nUndecl">–</b></div>
+      </div>
+    </section>
+
+    <section class="pane needs" aria-label="Label comparison">
+      <div class="row"><h2 style="margin:0">Components in the spectrum</h2><button class="btn" id="copy" type="button">Copy table</button></div>
+      <div class="tablewrap"><table id="tbl"><thead><tr><th>Component</th><th>Diagnostic band (cm⁻¹)</th><th>Reference</th><th>S/N</th><th>Result</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section class="pane needs" aria-label="Spectrum">
+      <div class="row"><h2 style="margin:0">Spectrum</h2></div>
+      <div class="tablewrap"><svg id="chart" viewBox="0 0 900 360" role="img" aria-label="Baseline-corrected absorbance spectrum with diagnostic bands"></svg></div>
+      <p class="note">Baseline-corrected absorbance. Diamond region 1880–2340 cm⁻¹ is excluded.</p>
+      <div class="row" style="margin-top:16px"><h2 style="margin:0">Talc OH band compared with NIST talc</h2></div>
+      <div class="legend"><span><span class="sw" style="background:var(--meas)"></span> This sample (ATR)</span><span><span class="sw" style="background:var(--talc)"></span> NIST talc, CAS 14807-96-6 (diffuse reflectance, log 1/R)</span></div>
+      <div class="tablewrap"><svg id="oh" viewBox="0 0 900 220" role="img" aria-label="OH stretching region of the sample overlaid on the NIST talc reference"></svg></div>
+      <p class="note">Only the OH stretching region is compared: the NIST spectrum was measured by diffuse reflectance of neat powder, so its fingerprint region (below 1300 cm⁻¹) is distorted and not comparable with ATR. A lower correlation can indicate other OH-bearing minerals, for example mica (Al–OH near 3626 cm⁻¹).</p>
+    </section>
+
+    <section class="pane" aria-label="Limitations">
+      <h2>Read before using the results</h2>
+      <ul class="caveats">
+        <li>Detection thresholds were set on 14 pans measured on one diamond-ATR instrument (single spectrum per pan). Validate on your own instrument before relying on them.</li>
+        <li>“Not detected” means below the detection rule, not proven absent. Kaolin and mica rules are provisional; synthetic mica has no OH band and cannot be seen in the OH region.</li>
+        <li>The NIST talc spectrum was measured by diffuse reflectance of neat powder, so only its OH stretching region is compared.</li>
+        <li>Stearate type is read from the carboxylate band position only; it indicates the metal, it does not quantify it.</li>
+      </ul>
+    </section>
+
+    <section class="pane" aria-label="References">
+      <h2>References</h2>
+      <ul class="caveats">
+        <li>Talc, CAS 14807-96-6, and PDMS, CAS 63148-62-9: NIST Chemistry WebBook, NIST Standard Reference Database 69, data from Pacific Northwest National Laboratory.</li>
+        <li>Mica (No. 4666) and calcite (Nos. 4659, 4660): NIST / Coblentz Society IR spectra collection.</li>
+        <li>Kaolin: Madejová J., Komadel P. (2001) <i>Clays Clay Miner.</i> 49, 410–432, doi:10.1346/CCMN.2001.0490508.</li>
+        <li>Ester emollients: McEwan et al. (2025) <i>Forensic Chem.</i> 45, 100677.</li>
+        <li>Magnesium stearate: SDBS No. 12704, Nujol and KBr disk, AIST, Japan.</li>
+        <li>Zinc stearate: Hermans J., Helwig K. (2020) <i>Appl. Spectrosc.</i> 74(12), doi:10.1177/0003702820935183; Larkin P. J., Jackson A. (2024) <i>Appl. Spectrosc. Pract.</i>, doi:10.1177/27551857241253834; NIST / Coblentz No. 1069.</li>
+        <li>Magnesium and calcium carbonate: Weir C. E., Lippincott E. R. (1961) <i>J. Res. Natl. Bur. Stand.</i> 65A, 173–183, doi:10.6028/jres.065A.021.</li>
+      </ul>
+    </section>
+  </main>
+</div>
+</div>
+
+<script>
+// Core processing for the eyeshadow ATR-FTIR label check (shared by page and tests)
+const Core = (() => {
+  const SG2 = [15, 6, -1, -6, -9, -10, -9, -6, -1, 6, 15].map(v => v / 429);
+
+  function parseSpectrum(text, mode) {
+    const pts = [];
+    for (const line of text.split(/\r?\n/)) {
+      const parts = line.trim().split(/[\s,;]+/).filter(Boolean);
+      if (parts.length < 2) continue;
+      const a = parseFloat(parts[0]), b = parseFloat(parts[1]);
+      if (!isFinite(a) || !isFinite(b)) continue;
+      pts.push([a, b]);
+    }
+    if (pts.length < 50) throw new Error('Could not read at least 50 data rows. The file needs two columns: wavenumber and transmittance (or absorbance).');
+    pts.sort((p, q) => p[0] - q[0]);
+    const ys = pts.map(p => p[1]);
+    const max = Math.max(...ys), med = ys.slice().sort((a, b) => a - b)[Math.floor(ys.length / 2)];
+    let kind = mode;
+    if (mode === 'auto') kind = max > 1.5 ? 'T%' : (med > 0.4 ? 'T' : 'A');
+    const absorb = pts.map(([w, y]) => {
+      if (kind === 'T%') return [w, -Math.log10(Math.max(y / 100, 1e-3))];
+      if (kind === 'T') return [w, -Math.log10(Math.max(y, 1e-3))];
+      return [w, y];
+    });
+    return { pts: absorb, kind };
+  }
+
+  function interp(xs, px, py) {
+    const out = new Array(xs.length);
+    let j = 0;
+    for (let i = 0; i < xs.length; i++) {
+      const v = xs[i];
+      if (v <= px[0]) { out[i] = py[0]; continue; }
+      if (v >= px[px.length - 1]) { out[i] = py[py.length - 1]; continue; }
+      while (px[j + 1] < v) j++;
+      const t = (v - px[j]) / (px[j + 1] - px[j]);
+      out[i] = py[j] + t * (py[j + 1] - py[j]);
+    }
+    return out;
+  }
+
+  // lower convex hull baseline ("rubberband")
+  function rubber(x, y) {
+    const h = [];
+    for (let i = 0; i < x.length; i++) {
+      while (h.length >= 2) {
+        const a = h[h.length - 2], b = h[h.length - 1];
+        const cross = (x[b] - x[a]) * (y[i] - y[a]) - (y[b] - y[a]) * (x[i] - x[a]);
+        if (cross <= 0) h.pop(); else break;
+      }
+      h.push(i);
+    }
+    return interp(x, h.map(i => x[i]), h.map(i => y[i]));
+  }
+
+  function deriv2(y) {
+    const n = y.length, out = new Array(n).fill(0);
+    for (let i = 5; i < n - 5; i++) {
+      let s = 0;
+      for (let k = -5; k <= 5; k++) s += SG2[k + 5] * y[i + k];
+      out[i] = s;
+    }
+    return out;
+  }
+
+  const std = a => { const m = a.reduce((s, v) => s + v, 0) / a.length; return Math.sqrt(a.reduce((s, v) => s + (v - m) ** 2, 0) / a.length); };
+  const idx = (x, lo, hi) => x.map((v, i) => (v > lo && v < hi ? i : -1)).filter(i => i >= 0);
+
+  function localProm(x, A, c, w, l, r) {
+    let best = -1, bi = 0;
+    for (const i of idx(x, c - w, c + w)) if (A[i] > best) { best = A[i]; bi = i; }
+    const al = interp([l], x, A)[0], ar = interp([r], x, A)[0];
+    return best - (al + (ar - al) * (x[bi] - l) / (r - l));
+  }
+
+  const BANDS = { talcOH: 3674, kaolin: 3689, stearateMg: 1576, mica: 3626, ch2: 2917, ester: 1740, stearate: 1540, co3: 1446, pdms: 1260, co3b: 872, co3mg: 748, caco3: 712, talcMg: 667 };
+
+  function features(x, A) {
+    const d2 = deriv2(A);
+    const noise = std(idx(x, 2450, 2650).map(i => d2[i])) || 1e-9;
+    const f = {};
+    for (const [k, c] of Object.entries(BANDS)) {
+      const w = k === 'kaolin' ? 4 : 6;
+      const ii = idx(x, c - w, c + w);
+      f[k] = -Math.min(...ii.map(i => d2[i])) / noise;
+    }
+    const pT = localProm(x, A, 3674, 3, 3660, 3690);
+    f.micaRatio = pT > 0 ? localProm(x, A, 3626, 6, 3605, 3650) / pT : 0;
+    return f;
+  }
+
+  const lvl = (v, hi, lo, tr) => v >= hi ? 'Detected' : v >= lo ? 'Minor' : (tr !== undefined && v >= tr) ? 'Trace' : 'Not detected';
+
+  function rules(f) {
+    return {
+      talc: f.talcOH >= 20 && f.talcMg > 0 ? 'Detected' : 'Not detected',
+      mica: f.micaRatio >= 0.40 ? 'Detected' : f.micaRatio >= 0.20 ? 'Possible' : 'Not detected',
+      kaolin: f.kaolin >= 20 ? 'Possible' : 'Not detected',
+      pdms: lvl(f.pdms, 40, 20, 10),
+      ester: lvl(f.ester, 20, 10),
+      stearate: lvl(Math.max(f.stearate, f.stearateMg), 20, 10),
+      // metal identity from the carboxylate band: Zn 1535-1540 (single); Mg 1573-1578 (SDBS 12704); Ca 1577 + 1540
+      stearateType: (f.stearate < 10 && f.stearateMg < 10) ? '' : f.stearateMg < 10 ? 'Zn-type (single band near 1540)' : f.stearate >= 10 ? 'Ca-type (1577 + 1540)' : 'Mg-type (near 1575)',
+      mgco3: f.co3mg >= 60 && f.co3 >= 10 ? 'Detected' : 'Not detected',
+      caco3: f.caco3 >= 25 && f.co3b >= 60 ? 'Detected' : 'Not detected',
+    };
+  }
+
+  // Talc identification against the NIST WebBook talc spectrum (OH stretching region only)
+  function nistMatch(x, A, nist) {
+    const W0 = 3620, W1 = 3720, grid = [];
+    for (let v = 3625; v <= 3715; v += 1) grid.push(v);
+    const win = (xs, ys) => {
+      const ii = xs.map((v, i) => (v > W0 && v < W1 ? i : -1)).filter(i => i >= 0);
+      const xx = ii.map(i => xs[i]), yy = ii.map(i => ys[i]);
+      const y0 = yy[0], y1 = yy[yy.length - 1], x0 = xx[0], x1 = xx[xx.length - 1];
+      return { xx, yy: yy.map((v, k) => v - (y0 + (y1 - y0) * (xx[k] - x0) / (x1 - x0))) };
+    };
+    const nx = nist.a.map((_, i) => nist.x0 + i * nist.dx);
+    const R = win(nx, nist.a), P = win(x, A);
+    const pk = w => w.xx[w.yy.indexOf(Math.max(...w.yy))];
+    const ref = interp(grid, R.xx, R.yy);
+    const corr = (a, b) => { const ma = a.reduce((s, v) => s + v, 0) / a.length, mb = b.reduce((s, v) => s + v, 0) / b.length;
+      let n = 0, da = 0, db = 0; a.forEach((v, i) => { n += (v - ma) * (b[i] - mb); da += (v - ma) ** 2; db += (b[i] - mb) ** 2; }); return n / Math.sqrt(da * db); };
+    let best = { r: -1, s: 0 };
+    for (let s = -6; s <= 6; s += 0.5) { const r = corr(interp(grid, P.xx.map(v => v + s), P.yy), ref); if (r > best.r) best = { r, s }; }
+    const pPan = pk(P), pRef = pk(R);
+    return { panPeak: pPan, nistPeak: pRef, shift: pPan - pRef, r: best.r, grid, ref, pan: interp(grid, P.xx, P.yy) };
+  }
+
+  function corrected(x, A) {
+    const a = A.slice(), b = rubber(x, a);
+    return a.map((v, i) => (x[i] > 1880 && x[i] < 2340) ? 0 : v - b[i]);
+  }
+
+  function analyse(x, A, nist) {
+    const f = features(x, A);
+    return { features: f, calls: rules(f), nist: nistMatch(x, A, nist), corrected: corrected(x, A) };
+  }
+
+  return { parseSpectrum, interp, analyse, features, rules };
+})();
+if (typeof module !== 'undefined') module.exports = Core;
+
+const DATA = {"x0": 398.220429, "dx": 2.0526826206503137, "n": 1754, "nist": {"x0": 3600.482, "dx": 0.964480645161292, "a": [0.527, 0.52464, 0.52227, 0.51993, 0.51764, 0.51543, 0.5133, 0.51123, 0.50917, 0.50709, 0.50496, 0.50279, 0.50062, 0.49851, 0.49651, 0.49461, 0.49277, 0.49096, 0.48914, 0.4873, 0.48539, 0.48341, 0.48135, 0.47926, 0.47721, 0.47528, 0.47353, 0.47198, 0.47057, 0.46919, 0.46773, 0.46616, 0.46455, 0.46301, 0.4616, 0.46032, 0.45915, 0.45805, 0.45698, 0.45593, 0.45497, 0.45421, 0.45372, 0.45342, 0.45314, 0.45268, 0.45191, 0.45087, 0.44973, 0.44872, 0.44798, 0.4475, 0.44717, 0.44696, 0.44705, 0.44805, 0.45105, 0.45765, 0.46948, 0.48725, 0.50933, 0.53088, 0.54491, 0.54609, 0.53473, 0.51678, 0.49968, 0.48878, 0.48642, 0.49297, 0.50827, 0.53261, 0.5669, 0.61236, 0.67003, 0.74004, 0.82002, 0.90165, 0.96595, 0.98625, 0.94911, 0.87069, 0.7797, 0.69593, 0.62703, 0.57346, 0.53268, 0.50144, 0.47676, 0.45612, 0.43745, 0.41923, 0.40067, 0.38178, 0.36313, 0.34536, 0.3289, 0.31387, 0.30016, 0.28762, 0.27609, 0.26554, 0.25595, 0.2473, 0.23954, 0.23256, 0.22628, 0.22061, 0.21551, 0.21095, 0.20687, 0.2032, 0.19986, 0.19678, 0.19386, 0.19104, 0.18828, 0.18554, 0.18283, 0.18019, 0.17763, 0.17513, 0.17267, 0.17021, 0.16776, 0.16536, 0.16304, 0.16085, 0.15878, 0.15683, 0.15496, 0.15317, 0.15145, 0.14985, 0.14841, 0.14713, 0.14596, 0.14479, 0.1435, 0.14203, 0.14037, 0.13857, 0.1367, 0.13486, 0.13314, 0.13167, 0.13049, 0.12959, 0.12884, 0.12806, 0.12714, 0.12608, 0.12501, 0.12408, 0.12337, 0.12283]}};
+const X = Array.from({length: DATA.n}, (_, i) => DATA.x0 + i * DATA.dx);
+const COMP = [
+  {id:'talc', name:'Talc', band:'3674 (OH), 667', ref:'NIST WebBook, CAS 14807-96-6', sn:f=>f.talcOH},
+  {id:'mica', name:'Mica', band:'3626 (ratio to 3674)', ref:'NIST Coblentz 4666', sn:f=>f.micaRatio, ratio:true},
+  {id:'kaolin', name:'Kaolin', band:'3689', ref:'Madejová & Komadel 2001', sn:f=>f.kaolin},
+  {id:'pdms', name:'Dimethicone / PDMS', band:'1260, 800', ref:'NIST WebBook, CAS 63148-62-9', sn:f=>f.pdms},
+  {id:'ester', name:'Ester emollients', band:'1740', ref:'McEwan et al. 2025', sn:f=>f.ester},
+  {id:'stearate', name:'Metal stearate', band:'1540 (Zn), 1575 (Mg)', ref:'SDBS 12704; Hermans & Helwig 2020', sn:f=>Math.max(f.stearate,f.stearateMg)},
+  {id:'mgco3', name:'Magnesium carbonate', band:'1446, 885, 748', ref:'Weir & Lippincott 1961', sn:f=>f.co3mg},
+  {id:'caco3', name:'Calcium carbonate', band:'1420, 872, 712', ref:'Weir & Lippincott 1961; NIST Coblentz 4659', sn:f=>f.caco3},
+];
+let state = {A:null, name:'', res:null};
+const $ = id => document.getElementById(id);
+
+function loadText(text, fname){
+  try{
+    const p = Core.parseSpectrum(text, $('units').value);
+    const w = p.pts.map(q=>q[0]);
+    if (w[0] > 700 || w[w.length-1] < 3700) throw new Error('The spectrum must cover at least 700–3700 cm⁻¹ to test all diagnostic bands.');
+    state.A = Core.interp(X, w, p.pts.map(q=>q[1]));
+    state.name = `${fname} · read as ${p.kind==='A'?'absorbance':p.kind==='T%'?'transmittance (%)':'transmittance (0–1)'}`;
+    $('err').textContent=''; run();
+  }catch(e){ $('err').textContent = e.message; }
+}
+function run(){ state.res = Core.analyse(X, state.A, DATA.nist); document.body.classList.add('loaded'); render(); }
+
+function verdict(call){
+  if (call==='Detected'||call==='Minor') return [call,'p-ok'];
+  if (call==='Trace'||call==='Possible') return [call,'p-warn'];
+  return ['Not detected','p-na'];
+}
+function render(){
+  if(!state.res) return;
+  const {features:f, calls, nist} = state.res;
+  $('sampleName').textContent = state.name;
+  let ok=0, weak=0, no=0; const rows=[];
+  for (const c of COMP){
+    const [v,cls] = verdict(calls[c.id]);
+    if(cls==='p-ok') ok++; else if(cls==='p-warn') weak++; else no++;
+    const sn = c.sn(f);
+    const extra = c.id==='stearate' && calls.stearateType && cls!=='p-na' ? calls.stearateType : '';
+    rows.push({c, v, cls, extra, sn: c.ratio ? sn.toFixed(2) : Math.round(sn)});
+  }
+  $('tbl').tBodies[0].innerHTML = rows.map(r=>`<tr><td>${r.c.name}${r.extra?`<div class="note">${r.extra}</div>`:''}</td><td class="num">${r.c.band}</td><td class="note">${r.c.ref}</td><td class="num">${r.sn}</td><td><span class="pill ${r.cls}">${r.v}</span></td></tr>`).join('');
+  $('nOk').textContent=ok; $('nMiss').textContent=weak; $('nUndecl').textContent=no;
+  $('share').textContent = 'r = '+nist.r.toFixed(2); $('shareSub').textContent = `Peak ${nist.panPeak.toFixed(1)} vs ${nist.nistPeak.toFixed(1)} cm⁻¹ (Δ ${nist.shift>=0?'+':''}${nist.shift.toFixed(1)})`;
+  state.rows = rows; drawChart();
+}
+function drawChart(){
+  const y = state.res.corrected, W=900, H=360, L=48, R=12, T=34, B=34;
+  const sx = v => L + (4000 - v) / 3600 * (W-L-R);
+  const ok = i => X[i]>=400 && X[i]<=4000 && !(X[i]>1880 && X[i]<2340);
+  let hi=0.01; y.forEach((v,i)=>{ if(ok(i)&&v>hi) hi=v; }); hi*=1.05; const lo=-0.03*hi;
+  const sy = v => T + (hi - v) / (hi - lo) * (H-T-B);
+  let d='', pen=false; for(let i=0;i<X.length;i++){ if(!ok(i)){pen=false;continue;} d+=(pen?'L':'M')+sx(X[i]).toFixed(1)+' '+sy(y[i]).toFixed(1); pen=true; }
+  let g = `<rect x="${sx(2340)}" y="${T}" width="${sx(1880)-sx(2340)}" height="${H-T-B}" fill="var(--shade)"/>`;
+  for(let v=4000; v>=500; v-=500) g += `<line x1="${sx(v)}" x2="${sx(v)}" y1="${H-B}" y2="${H-B+4}" stroke="var(--muted)"/><text x="${sx(v)}" y="${H-B+17}" text-anchor="middle">${v}</text>`;
+  g += `<text x="${(L+W-R)/2}" y="${H-2}" text-anchor="middle">Wavenumber (cm⁻¹)</text>`;
+  g += `<line x1="${L}" x2="${L}" y1="${T}" y2="${H-B}" stroke="var(--line)"/><line x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}" stroke="var(--line)"/>`;
+  g += `<text x="12" y="${(T+H-B)/2}" transform="rotate(-90 12 ${(T+H-B)/2})" text-anchor="middle">Absorbance</text>`;
+  [[3674,'talc',0],[3626,'mica',1],[2917,'CH₂',0],[1740,'C=O',0],[1540,'COO⁻ Zn',1],[1576,'Mg',0],[1446,'CO₃',0],[1260,'Si–CH₃',1],[667,'talc',0]].forEach(([b,l,row])=>{
+    g += `<line x1="${sx(b)}" x2="${sx(b)}" y1="${T}" y2="${H-B}" stroke="var(--line)" stroke-dasharray="2 3"/><text x="${sx(b)}" y="${T-20+row*13}" text-anchor="middle">${l}</text>`;
+  });
+  g += `<path d="${d}" fill="none" stroke="var(--meas)" stroke-width="1.2"/>`;
+  $('chart').innerHTML = g;
+  // OH inset
+  const n = state.res.nist, W2=900, H2=220, L2=48, R2=12, T2=12, B2=34;
+  const norm = a => { const m = Math.max(...a); return a.map(v => v / (m || 1)); };
+  const p = norm(n.pan), r = norm(n.ref);
+  const mn = Math.min(0, ...p, ...r) - 0.05; const sx2 = v => L2 + (3715 - v) / 90 * (W2-L2-R2), sy2 = v => T2 + (1.12 - v) / (1.12 - mn) * (H2-T2-B2);
+  const line = a => a.map((v,i)=>(i?'L':'M')+sx2(n.grid[i]).toFixed(1)+' '+sy2(v).toFixed(1)).join('');
+  let g2 = '';
+  for(let v=3710; v>=3630; v-=20) g2 += `<line x1="${sx2(v)}" x2="${sx2(v)}" y1="${H2-B2}" y2="${H2-B2+4}" stroke="var(--muted)"/><text x="${sx2(v)}" y="${H2-B2+17}" text-anchor="middle">${v}</text>`;
+  g2 += `<line x1="${L2}" x2="${W2-R2}" y1="${H2-B2}" y2="${H2-B2}" stroke="var(--line)"/>`;
+  g2 += `<text x="${(L2+W2-R2)/2}" y="${H2-2}" text-anchor="middle">Wavenumber (cm⁻¹)</text>`;
+  [[n.nistPeak,'NIST '+n.nistPeak.toFixed(1),'end',-6],[n.panPeak,'sample '+n.panPeak.toFixed(1),'start',6],[3626,'Al–OH (mica)','end',-6]].forEach(([b,l,anc,dx])=>{ g2 += `<line x1="${sx2(b)}" x2="${sx2(b)}" y1="${T2}" y2="${H2-B2}" stroke="var(--line)" stroke-dasharray="2 3"/><text x="${sx2(b)+dx}" y="${T2+12}" text-anchor="${anc}">${l}</text>`; });
+  g2 += `<path d="${line(r)}" fill="none" stroke="var(--talc)" stroke-width="1.4"/><path d="${line(p)}" fill="none" stroke="var(--meas)" stroke-width="1.4"/>`;
+  $('oh').innerHTML = g2;
+}
+
+
+$('units').addEventListener('change', ()=>{ if(state.lastText) loadText(state.lastText, state.lastName); });
+function readFile(file){ const r=new FileReader(); r.onload=()=>{ state.lastText=r.result; state.lastName=file.name; loadText(r.result, file.name); }; r.readAsText(file); }
+$('file').addEventListener('change', e=>{ if(e.target.files[0]) readFile(e.target.files[0]); });
+const drop=$('drop');
+['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop', e=>{ const f=e.dataTransfer.files[0]; if(f) readFile(f); });
+$('copy').addEventListener('click', async ()=>{
+  if(!state.rows) return;
+  const txt = ['Component\tBand (cm-1)\tReference\tS/N\tResult', ...state.rows.map(r=>[r.c.name+(r.extra?' ('+r.extra+')':''),r.c.band,r.c.ref,r.sn,r.v].join('\t'))].join('\n');
+  try{ await navigator.clipboard.writeText(txt); $('copy').textContent='Copied'; }catch(e){ $('copy').textContent='Copy blocked'; }
+  setTimeout(()=>$('copy').textContent='Copy table',1500);
+});
+</script>
+
+</body>
+</html>

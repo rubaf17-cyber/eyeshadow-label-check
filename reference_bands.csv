@@ -1,0 +1,15 @@
+component,band_cm-1,assignment,role_in_tool,source,link
+Talc,3674,Mg3-OH stretching,detection + NIST OH-region match,NIST Chemistry WebBook (PNNL) CAS 14807-96-6,https://webbook.nist.gov/cgi/cbook.cgi?ID=14807-96-6&Units=SI&cIR=on
+Talc,667,Mg-OH / Si-O-Mg bending,detection (supporting),NIST Chemistry WebBook (PNNL) CAS 14807-96-6,https://webbook.nist.gov/cgi/cbook.cgi?ID=14807-96-6&Units=SI&cIR=on
+Mica,3626,Al-OH stretching (ratio to 3674),detection,NIST / Coblentz No. 4666,https://webbook.nist.gov/cgi/cbook.cgi?ID=B6004666&Units=SI&cIR=on
+Kaolin,3689,inner-surface OH stretching (ATR),detection,Madejova & Komadel (2001) Clays Clay Miner. 49 410-432,https://doi.org/10.1346/CCMN.2001.0490508
+PDMS (dimethicone),1260,Si-CH3 symmetric deformation,detection,NIST Chemistry WebBook (PNNL) CAS 63148-62-9,https://webbook.nist.gov/cgi/cbook.cgi?ID=63148-62-9&Units=SI&cIR=on
+PDMS (dimethicone),800,Si-CH3 rocking / Si-C stretching,label in tool,NIST Chemistry WebBook (PNNL) CAS 63148-62-9,https://webbook.nist.gov/cgi/cbook.cgi?ID=63148-62-9&Units=SI&cIR=on
+Ester emollients,1740,C=O stretching,detection,McEwan et al. (2025) Forensic Chem. 45 100677 Table 3,
+Zinc stearate,1540,COO- asymmetric stretching (single band 1535-1540),detection + stearate type,Hermans & Helwig (2020); Larkin & Jackson (2024); NIST / Coblentz No. 1069,https://doi.org/10.1177/0003702820935183
+Magnesium stearate,1576,COO- asymmetric stretching (1573 KBr; 1578 Nujol),detection + stearate type,SDBS No. 12704 (AIST),https://sdbs.db.aist.go.jp/CompoundLanding.aspx?sdbsno=12704
+Calcium stearate,1577 + 1540,COO- asymmetric stretching (two bands),stearate type,Larkin & Jackson (2024),https://doi.org/10.1177/27551857241253834
+Magnesium carbonate,1446,CO3 nu3 asymmetric stretching,detection (supporting),Weir & Lippincott (1961) J. Res. Natl. Bur. Stand. 65A 173-183,https://doi.org/10.6028/jres.065A.021
+Magnesium carbonate,748,CO3 nu4 in-plane bending (magnesite),detection,Weir & Lippincott (1961),https://doi.org/10.6028/jres.065A.021
+Calcium carbonate,872,CO3 nu2 out-of-plane bending,detection (supporting),Weir & Lippincott (1961); NIST / Coblentz Nos. 4659 4660,https://doi.org/10.6028/jres.065A.021
+Calcium carbonate,712,CO3 nu4 in-plane bending (calcite),detection,Weir & Lippincott (1961); NIST / Coblentz Nos. 4659 4660,https://webbook.nist.gov/cgi/cbook.cgi?ID=B6004659&Units=SI&cIR=on
