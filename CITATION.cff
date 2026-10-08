@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Eyeshadow Label Check: an open-source ATR-FTIR screening tool for eyeshadow base ingredients"
+type: software
+authors:
+  - family-names: "Abbas"
+    given-names: "Ruba Fahmi"
+    affiliation: "Department of Chemistry, College of Science, Mustansiriyah University, Baghdad, Iraq"
+version: "0.4"
+date-released: "2026-10-08"
+license: MIT
+repository-code: "https://github.com/rubaf17-cyber/eyeshadow-label-check"
+url: "https://rubaf17-cyber.github.io/eyeshadow-label-check/"
+keywords:
+  - ATR-FTIR
+  - eyeshadow
+  - cosmetics
+  - label verification
+  - talc
+  - metal stearate
+  - rule-based classification
+abstract: "Browser-based, rule-based ATR-FTIR tool that screens one eyeshadow spectrum for eight common base ingredients (talc, mica, kaolin, PDMS, ester emollients, metal stearate, MgCO3, CaCO3) using diagnostic bands from NIST, SDBS and published references, and compares the talc OH band with the NIST talc spectrum."
