@@ -1,4 +1,5 @@
 # Eyeshadow Label Check
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23250764.svg)](https://doi.org/10.5281/zenodo.23250764)
 
 Open-source ATR-FTIR tool for screening eyeshadow pans for eight common base ingredients and checking them against label claims.
 
@@ -75,7 +76,7 @@ v0.4: upload-only interface (example pans removed); the spectrum is analysed in 
 v0.3: label input removed; kaolin band moved to 3689 cm⁻¹; stearate metal type added; reference list added.
 
 ## Citation
-Abbas, R. F. (2026). Eyeshadow Label Check. GitHub repository. [DOI to be added]
+Abbas, R. F. (2026). Eyeshadow Label Check: an open-source ATR-FTIR screening tool for eyeshadow base ingredients (v0.4.1). Zenodo. https://doi.org/10.5281/zenodo.23250764
 
 ## License
 MIT
